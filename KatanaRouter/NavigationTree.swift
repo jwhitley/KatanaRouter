@@ -83,7 +83,7 @@ final public class NavigationTreeNode: Equatable {
     ///   - postOrder: Traverses post order if true. Pre-order if false.
     ///   - visitNode: visitNode is called when a node is visited
     public func traverse(postOrder: Bool, visitNode: (NavigationTreeNode) -> ()) {
-        let activeChildrenLast = children.sorted { !($0.0.isActiveRoute) }
+        let activeChildrenLast = children.sorted { (lhs, _) -> Bool in !(lhs.isActiveRoute) }
         
         if !postOrder {
             visitNode(self)
