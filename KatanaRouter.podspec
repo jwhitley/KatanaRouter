@@ -11,8 +11,9 @@ Pod::Spec.new do |s|
   s.social_media_url = "https://twitter.com/MichaelCiurus"
   s.source           = { :git => "https://github.com/michalciurus/KatanaRouter.git", :tag => s.version.to_s }
   s.ios.deployment_target = '8.3'
-  s.osx.deployment_target = '10.10'	
+  s.osx.deployment_target = '10.10'
   s.requires_arc = true
   s.source_files     = 'KatanaRouter/**/*.swift'
-  s.dependency 'Katana', '~> 0.6.1'
+  s.dependency 'ReactiveReSwift', '~> 3.0.6'
+  s.dependency 'RxSwift',         '~> 3.6.1'
 end

@@ -6,14 +6,16 @@
 //  Copyright © 2017 Michal Ciurus. All rights reserved.
 //
 
-import Katana
+import ReactiveReSwift
+import RxSwift
 
 internal struct SetRootDestination: Action {
     
     let rootDestination: Destination
     
-    public func updatedState(currentState: State) -> State {
-        guard var state = currentState as? RoutableState else { return currentState }
+    public func updatedState<State: RoutableState>(currentState: State) -> State {
+        var state = currentState
+
         let rootNode = NavigationTreeNode(value: rootDestination, isActiveRoute: true)
         state.navigationState.setNavigationTreeRootNode(rootNode)
         return state
@@ -23,32 +25,39 @@ internal struct SetRootDestination: Action {
 /// Router reacts to the changes in the navigation tree and informs all the routables of the
 /// differences that they need to react to
 final public class Router<State: RoutableState> {
-    
-    fileprivate let store: Store<State>
+    public typealias RouterStore = Store<Variable<State>>
+
+    fileprivate let store: RouterStore
     fileprivate var lastNavigationStateCopy: NavigationTreeNode?
-    fileprivate let routingQueue: DispatchQueue
+    fileprivate let disposeBag = DisposeBag()
     fileprivate var routables: [Destination : Routable]
-    
+
+    fileprivate lazy var routingQueue = DispatchQueue(label: "RoutingQueue", attributes: [])
+    fileprivate lazy var routingScheduler = SerialDispatchQueueScheduler(queue: self.routingQueue, internalSerialQueueName: "RxRoutingQueue")
+
     /// - Parameters:
     ///   - store: current store
     ///   - rootRoutable: your root Routable instance. If your root node of your navigation tree is empty the Router will create it for you.
     ///   - rootIdentifier: your root Routable user identifier. Ignored if the navigation tree already has a root
-    public init(store: Store<State>, rootRoutable: Routable, rootIdentifier: String? = nil) {
+    public init(store: RouterStore, rootRoutable: Routable, rootIdentifier: String? = nil) {
         self.store = store
         self.routables = [ : ]
-        routingQueue = DispatchQueue(label: "RoutingQueue", attributes: [])
-        _ =  store.addListener { [weak self] in
-            self?.stateChanged()
-        }
-        
+
+        store.observable.asObservable()
+          .observeOn(routingScheduler)
+          .subscribe(onNext: { [weak self] state in
+            self?.stateChanged(state)
+          })
+          .disposed(by: disposeBag)
+
         setupRootForRoutable(rootRoutable, identifier: rootIdentifier)
     }
 }
 
 private extension Router {
     
-    func stateChanged() {
-        var currentState = store.state
+    func stateChanged(_ state: State) {
+        var currentState = state
         let currentRootNode = currentState.navigationState.mutateNavigationTreeRootNode()
         fireActionsForChanges(lastState: lastNavigationStateCopy, currentState: currentRootNode)
         lastNavigationStateCopy = currentRootNode?.deepCopy()
@@ -63,7 +72,8 @@ private extension Router {
             // Users need call the handlers, because UI transitions take time/are asynchronous
             // so we can't fire all the events synchronously
             let completionSemaphore = DispatchSemaphore(value: 0)
-            
+
+
             routingQueue.async {
                 let completion: RoutableCompletion = {
                     completionSemaphore.signal()
@@ -153,7 +163,7 @@ private extension Router {
     /// - Parameter routable: root routable to be set
     /// - Parameter identifier: if new root is created, this identifier will used
     func setupRootForRoutable(_ routable: Routable, identifier: String?) {
-        var currentState = store.state
+        var currentState = store.observable.value
         // User has already set up a tree, we just have to add a routable for the root node
         if let rootNode = currentState.navigationState.mutateNavigationTreeRootNode() {
             if identifier != nil {

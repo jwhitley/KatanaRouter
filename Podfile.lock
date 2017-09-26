@@ -1,12 +1,15 @@
 PODS:
-  - Katana (0.6.1)
+  - ReactiveReSwift (3.0.6)
+  - RxSwift (3.6.1)
 
 DEPENDENCIES:
-  - Katana
+  - ReactiveReSwift
+  - RxSwift (~> 3.6.1)
 
 SPEC CHECKSUMS:
-  Katana: 4e529321d281770d1ee99ed3291b2be22878fc97
+  ReactiveReSwift: c5a11543509b28abb23224f9a391fa8366b5e3bb
+  RxSwift: f9de85ea20cd2f7716ee5409fc13523dc638e4e4
 
-PODFILE CHECKSUM: fe594cdc894ecdf192755558d99285321c7628c6
+PODFILE CHECKSUM: b01dc3d6d9661bcd26050c9acd0161884958a36c
 
-COCOAPODS: 1.2.0
+COCOAPODS: 1.3.1

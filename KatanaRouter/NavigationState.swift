@@ -6,9 +6,9 @@
 //  Copyright © 2017 Michal Ciurus. All rights reserved.
 //
 
-import Katana
+import Foundation
 
-public protocol RoutableState: State {
+public protocol RoutableState {
     var navigationState: NavigationState { get set }
 }
 

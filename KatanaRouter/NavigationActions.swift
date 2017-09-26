@@ -6,7 +6,8 @@
 //  Copyright © 2017 Michal Ciurus. All rights reserved.
 //
 
-import Katana
+import Foundation
+import ReactiveReSwift
 
 /// Add a new destination on top of the current route
 public struct AddNewDestination: Action {
@@ -17,8 +18,8 @@ public struct AddNewDestination: Action {
         self.destination = destination
     }
     
-    public func updatedState(currentState: State) -> State {
-        guard var state = currentState as? RoutableState else { return currentState }
+  public func updatedState<State: RoutableState> (currentState: State) -> State {
+        var state = currentState
         state.navigationState.addNewDestinationToActiveRoute(destination: destination)
         return state
     }
@@ -36,8 +37,8 @@ public struct RemoveDestination: Action {
         self.instanceIdentifier = instanceIdentifier
     }
     
-    public func updatedState(currentState: State) -> State {
-        guard var state = currentState as? RoutableState else { return currentState }
+    public func updatedState<State: RoutableState>(currentState: State) -> State {
+        var state = currentState
         state.navigationState.removeDestination(instanceIdentifier: instanceIdentifier)
         return state
     }
@@ -45,8 +46,8 @@ public struct RemoveDestination: Action {
 
 /// Removes currently active destination
 public struct RemoveCurrentDestination: Action {
-    public func updatedState(currentState: State) -> State {
-        guard var state = currentState as? RoutableState else { return currentState }
+    public func updatedState<State: RoutableState>(currentState: State) -> State {
+        var state = currentState
         state.navigationState.removeDestinationAtActiveRoute()
         return state
     }
@@ -83,8 +84,8 @@ public struct AddChildrenToDestination: Action {
         self.activeDestination = child
     }
     
-    public func updatedState(currentState: State) -> State {
-        guard var state = currentState as? RoutableState else { return currentState }
+    public func updatedState<State: RoutableState>(currentState: State) -> State {
+        var state = currentState
         guard let node = state.navigationState.mutateNavigationTreeRootNode()?.find(userIdentifier: destinationIdentifier) else {
             return currentState
         }
