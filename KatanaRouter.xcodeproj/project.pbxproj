@@ -20,6 +20,9 @@
 		3FBEAADB1E5610800006FC20 /* ExampleTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEAADA1E5610800006FC20 /* ExampleTree.swift */; };
 		9788A69C382E1298CBF238A2 /* Pods_KatanaRouterTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 964627EF07D75324E3B735AA /* Pods_KatanaRouterTests.framework */; };
 		E1B3C90B1F7AF9D600B5104E /* ReactiveReSwiftBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3C90A1F7AF9D600B5104E /* ReactiveReSwiftBridge.swift */; };
+		E1B3C9181F7EF88C00B5104E /* NavigationReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3C9171F7EF88C00B5104E /* NavigationReducer.swift */; };
+		E1B3C91A1F7F056B00B5104E /* RouterActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3C9191F7F056B00B5104E /* RouterActions.swift */; };
+		E1B3C91C1F7F0FB900B5104E /* NavigationMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1B3C91B1F7F0FB900B5104E /* NavigationMiddleware.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +56,9 @@
 		D3EC91CC4051BCB92A3C485F /* Pods-KatanaRouter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KatanaRouter.debug.xcconfig"; path = "Pods/Target Support Files/Pods-KatanaRouter/Pods-KatanaRouter.debug.xcconfig"; sourceTree = "<group>"; };
 		E0A935256C2E1FBF8030FE15 /* Pods_KatanaRouter.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KatanaRouter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1B3C90A1F7AF9D600B5104E /* ReactiveReSwiftBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactiveReSwiftBridge.swift; sourceTree = "<group>"; };
+		E1B3C9171F7EF88C00B5104E /* NavigationReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationReducer.swift; sourceTree = "<group>"; };
+		E1B3C9191F7F056B00B5104E /* RouterActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterActions.swift; sourceTree = "<group>"; };
+		E1B3C91B1F7F0FB900B5104E /* NavigationMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationMiddleware.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,13 +105,14 @@
 		3FBEAAB31E5601AE0006FC20 /* KatanaRouter */ = {
 			isa = PBXGroup;
 			children = (
+				E1B3C9141F7EF78700B5104E /* ReactiveReSwift */,
 				3FBEAACC1E56038F0006FC20 /* NavigationActions.swift */,
 				3FBEAACD1E56038F0006FC20 /* NavigationState.swift */,
 				3FBEAACE1E56038F0006FC20 /* NavigationTree.swift */,
 				3FBEAACF1E56038F0006FC20 /* NavigationTreeDiff.swift */,
-				E1B3C90A1F7AF9D600B5104E /* ReactiveReSwiftBridge.swift */,
 				3FBEAAD01E56038F0006FC20 /* Routable.swift */,
 				3FBEAAD11E56038F0006FC20 /* Router.swift */,
+				E1B3C9191F7F056B00B5104E /* RouterActions.swift */,
 				3FBEAAB51E5601AE0006FC20 /* Info.plist */,
 			);
 			path = KatanaRouter;
@@ -140,6 +147,16 @@
 				6D47E5070F181D6EB9E4BFE4 /* Pods-KatanaRouterTests.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		E1B3C9141F7EF78700B5104E /* ReactiveReSwift */ = {
+			isa = PBXGroup;
+			children = (
+				E1B3C91B1F7F0FB900B5104E /* NavigationMiddleware.swift */,
+				E1B3C9171F7EF88C00B5104E /* NavigationReducer.swift */,
+				E1B3C90A1F7AF9D600B5104E /* ReactiveReSwiftBridge.swift */,
+			);
+			path = ReactiveReSwift;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -347,11 +364,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1B3C9181F7EF88C00B5104E /* NavigationReducer.swift in Sources */,
 				3FBEAAD51E56038F0006FC20 /* NavigationTreeDiff.swift in Sources */,
 				3FBEAAD41E56038F0006FC20 /* NavigationTree.swift in Sources */,
 				3FBEAAD21E56038F0006FC20 /* NavigationActions.swift in Sources */,
 				3FBEAAD31E56038F0006FC20 /* NavigationState.swift in Sources */,
+				E1B3C91A1F7F056B00B5104E /* RouterActions.swift in Sources */,
 				3FBEAAD71E56038F0006FC20 /* Router.swift in Sources */,
+				E1B3C91C1F7F0FB900B5104E /* NavigationMiddleware.swift in Sources */,
 				E1B3C90B1F7AF9D600B5104E /* ReactiveReSwiftBridge.swift in Sources */,
 				3FBEAAD61E56038F0006FC20 /* Routable.swift in Sources */,
 			);

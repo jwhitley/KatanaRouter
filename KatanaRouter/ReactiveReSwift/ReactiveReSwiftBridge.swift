@@ -3,11 +3,18 @@
 //  gemioios
 //
 //  Created by John Whitley on 9/15/17.
-//  Copyright © 2017 Loop Devices, Inc. All rights reserved.
+//  Copyright © 2017 John Whitley. See LICENSE.md.
 //
 
 import ReactiveReSwift
 import RxSwift
+
+extension AddNewDestination: Action { }
+extension RemoveDestination: Action { }
+extension RemoveCurrentDestination: Action { }
+extension AddChildrenToDestination: Action { }
+extension SetRootDestination: Action { }
+extension SetRootRoutable: Action { }
 
 extension Variable: ObservablePropertyType {
   public typealias ValueType = Element
