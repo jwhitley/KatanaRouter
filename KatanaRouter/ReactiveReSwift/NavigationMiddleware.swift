@@ -12,8 +12,12 @@ public protocol RoutableState {
   var navigationState: NavigationState { get set }
 }
 
-class NavigationMiddleware<State: RoutableState> {
+public class NavigationMiddleware<State: RoutableState> {
   var router: Router!
+
+  public var middleware: Middleware<State> {
+    return Middleware(navMiddleware, routerMiddleware)
+  }
 
   private var navMiddleware: Middleware<State>  {
     return Middleware<State>().sideEffect { getState, dispatch, action in
