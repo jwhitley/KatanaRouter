@@ -3,37 +3,41 @@
 //  KatanaRouter
 //
 //  Created by John Whitley on 9/29/17.
-//  Copyright © 2017 Michal Ciurus. All rights reserved.
+//  Copyright © 2017 John Whitley. See LICENSE.md.
 //
 
 import ReactiveReSwift
 
 public protocol RoutableState {
-  var navigationState: NavigationState { get set }
+  associatedtype ViewController: Routable
+
+  var navigationState: NavigationState<ViewController> { get set }
 }
 
-public class NavigationMiddleware<State: RoutableState> {
-  var router: Router!
+public class NavigationMiddleware<Store: RouterStore, ViewController, State: RoutableState>
+  where State.ViewController == ViewController {
+
+  var router: Router<Store, ViewController>!
+
+  public init () { }
 
   public var middleware: Middleware<State> {
     return Middleware(navMiddleware, routerMiddleware)
   }
 
-  private var navMiddleware: Middleware<State>  {
+  private var navMiddleware: Middleware<State> {
     return Middleware<State>().sideEffect { getState, dispatch, action in
-      guard let setRootAction = action as? SetRootRoutable else {
+      /* >>>>> ACTION: SetRootRoutable <<<<< */
+      guard let setRootAction = action as? SetRootRoutable<ViewController> else {
         return
       }
 
-      if self.router == nil {
-        self.router = setRootAction.router
+      if self.router == nil, let router = setRootAction.router as? Router<Store, ViewController> {
+        self.router = router
       }
 
-      if let action = self.router.setupRootForRoutable(state: getState(),
-                                       routable: setRootAction.routable,
-                                       identifier: setRootAction.identifier) {
-        dispatch(action)
-      }
+      self.router.setupRootForRoutable(state: getState(),
+                                       destination: setRootAction.destination)
     }
   }
 

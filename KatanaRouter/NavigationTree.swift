@@ -10,16 +10,16 @@ import Foundation
 
 
 /// Navigation tree node, used to build a tree structure of the navigation state
-final public class NavigationTreeNode: Equatable {
+final public class NavigationTreeNode<ViewController: Routable>: Equatable {
   
-  public let value: Destination
+  public let value: Destination<ViewController>
   /// Active route is the currently visible navigation path of nodes
   public var isActiveRoute: Bool
   public var parentNode: NavigationTreeNode?
   
   public private(set) var children: [NavigationTreeNode]
   
-  public init(value: Destination, children: [NavigationTreeNode] = [], isActiveRoute: Bool, parentNode: NavigationTreeNode? = nil) {
+  public init(value: Destination<ViewController>, children: [NavigationTreeNode] = [], isActiveRoute: Bool, parentNode: NavigationTreeNode? = nil) {
     self.value = value
     self.children = []
     self.isActiveRoute = isActiveRoute
@@ -98,13 +98,13 @@ final public class NavigationTreeNode: Equatable {
     }
   }
   
-  public func find(value: Destination) -> NavigationTreeNode? {
+  public func find(value: Destination<ViewController>) -> NavigationTreeNode? {
     return find() {
       $0.value == value
     }
   }
   
-  public func find(findCondition: (NavigationTreeNode) -> Bool) -> NavigationTreeNode?{
+  public func find(findCondition: (NavigationTreeNode<ViewController>) -> Bool) -> NavigationTreeNode?{
     if findCondition(self) {
       return self
     }
@@ -119,13 +119,13 @@ final public class NavigationTreeNode: Equatable {
     return nil
   }
   
-  public func find(userIdentifier: String) -> NavigationTreeNode? {
+  public func find(userIdentifier: String) -> NavigationTreeNode<ViewController>? {
     return find() {
       $0.value.userIdentifier == userIdentifier
     }
   }
   
-  public func containsValue(value: Destination) -> Bool {
+  public func containsValue(value: Destination<ViewController>) -> Bool {
     return find(value: value) != nil ? true : false
   }
   
@@ -133,7 +133,7 @@ final public class NavigationTreeNode: Equatable {
   /// Creates a deep copy of the node and it's children
   /// It does not create a copy of the parent! That's why it's best that this method is used on the root of the tree
   /// - Returns: deep copy of the tree
-  public func deepCopy() -> NavigationTreeNode {
+  public func deepCopy() -> NavigationTreeNode<ViewController> {
     var childrenCopies: [NavigationTreeNode] = []
     
     let navigationNodeCopy = NavigationTreeNode(value: value, children: [ ], isActiveRoute: isActiveRoute)
@@ -149,7 +149,7 @@ final public class NavigationTreeNode: Equatable {
     return navigationNodeCopy
   }
   
-  public static func ==(lhs: NavigationTreeNode, rhs: NavigationTreeNode) -> Bool {
+  public static func ==(lhs: NavigationTreeNode<ViewController>, rhs: NavigationTreeNode<ViewController>) -> Bool {
     return lhs.value == rhs.value
   }
 }

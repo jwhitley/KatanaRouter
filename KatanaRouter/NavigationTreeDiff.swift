@@ -8,14 +8,14 @@
 
 import Foundation
 
-enum NavigationTreeDiffAction {
-  case push(nodeToPush: NavigationTreeNode)
-  case pop(nodeToPop: NavigationTreeNode)
-  case changed(poppedNodes: [NavigationTreeNode], pushedNodes: [NavigationTreeNode])
-  case changedActiveChild(currentActiveChild: NavigationTreeNode)
+enum NavigationTreeDiffAction<ViewController: Routable> {
+  case push(nodeToPush: NavigationTreeNode<ViewController>)
+  case pop(nodeToPop: NavigationTreeNode<ViewController>)
+  case changed(poppedNodes: [NavigationTreeNode<ViewController>], pushedNodes: [NavigationTreeNode<ViewController>])
+  case changedActiveChild(currentActiveChild: NavigationTreeNode<ViewController>)
 }
 
-class NavigationTreeDiff {
+class NavigationTreeDiff<ViewController: Routable> {
   
   /// Returns an array of actions, which are the differences between lastState and currentState
   /// This method **does not change the state of the trees in any way**
@@ -23,10 +23,10 @@ class NavigationTreeDiff {
   ///   - lastState: last state tree
   ///   - currentState: current state tree
   /// - Returns: array of actions in order. Pops are always first.
-  static func getNavigationDiffActions(lastState: NavigationTreeNode?, currentState: NavigationTreeNode?) -> [NavigationTreeDiffAction] {
+  static func getNavigationDiffActions(lastState: NavigationTreeNode<ViewController>?, currentState: NavigationTreeNode<ViewController>?) -> [NavigationTreeDiffAction<ViewController>] {
     
-    var nodesToPop: [NavigationTreeNode] = []
-    var nodesToPush: [NavigationTreeNode] = []
+    var nodesToPop: [NavigationTreeNode<ViewController>] = []
+    var nodesToPush: [NavigationTreeNode<ViewController>] = []
     
     //1. Find all the pops: nods that were in the last tree, but aren't in the current.
     //   The order of the nodes is in post-order.
@@ -47,17 +47,17 @@ class NavigationTreeDiff {
     
     // We need unique parents to go through them and find group all the pushes and pops
     // that happen on the same parent
-    let uniquePushParents: [NavigationTreeNode?] = getUniqueParents(nodesToPush)
+    let uniquePushParents: [NavigationTreeNode<ViewController>?] = getUniqueParents(nodesToPush)
     var filteredSinglePopNodes = nodesToPop
-    var insertActions: [NavigationTreeDiffAction] = []
+    var insertActions: [NavigationTreeDiffAction<ViewController>] = []
     
     //3. Now we're merging all the complex pushes and pushes that have the corresponding pops
     //   We're doing it to create `change` actions.
     for uniquePushParent in uniquePushParents {
-      let sameParentFilter: (NavigationTreeNode) -> Bool = {
+      let sameParentFilter: (NavigationTreeNode<ViewController>) -> Bool = {
         $0.parentNode == uniquePushParent
       }
-      let differentParentFilter: (NavigationTreeNode) -> Bool = {
+      let differentParentFilter: (NavigationTreeNode<ViewController>) -> Bool = {
         $0.parentNode != uniquePushParent
       }
       
@@ -86,9 +86,9 @@ class NavigationTreeDiff {
   
   /// - Parameter nodesToPop: an array of nodes to pop
   /// - Returns: singular pop actions and more complex pops (more than one)
-  static func getPopActions(from nodesToPop: [NavigationTreeNode]) -> [NavigationTreeDiffAction] {
-    var popActions: [NavigationTreeDiffAction] = []
-    let uniquePopParents: [NavigationTreeNode?] = getUniqueParents(nodesToPop)
+  static func getPopActions(from nodesToPop: [NavigationTreeNode<ViewController>]) -> [NavigationTreeDiffAction<ViewController>] {
+    var popActions: [NavigationTreeDiffAction<ViewController>] = []
+    let uniquePopParents: [NavigationTreeNode<ViewController>?] = getUniqueParents(nodesToPop)
     
     for uniquePopParent in uniquePopParents {
       let popsWithSameParent = nodesToPop.filter {
@@ -112,8 +112,8 @@ class NavigationTreeDiff {
   ///   - lastState: lastState tree
   ///   - currentState: currentState tree
   /// - Returns: `changedActiveChild` actions.
-  static func getChangedActiveChildActions(lastState: NavigationTreeNode?, currentState: NavigationTreeNode?) -> [NavigationTreeDiffAction] {
-    var changedActiveChildActions: [NavigationTreeDiffAction] = []
+  static func getChangedActiveChildActions(lastState: NavigationTreeNode<ViewController>?, currentState: NavigationTreeNode<ViewController>?) -> [NavigationTreeDiffAction<ViewController>] {
+    var changedActiveChildActions: [NavigationTreeDiffAction<ViewController>] = []
     currentState?.traverse(postOrder: true) { node in
       guard let currentActiveChild = node.getActiveChild() else {
         return
@@ -128,8 +128,8 @@ class NavigationTreeDiff {
     return changedActiveChildActions
   }
   
-  static func getUniqueParents(_ nodes: [NavigationTreeNode]) -> [NavigationTreeNode?] {
-    var uniqueParents: [NavigationTreeNode?] = []
+  static func getUniqueParents(_ nodes: [NavigationTreeNode<ViewController>]) -> [NavigationTreeNode<ViewController>?] {
+    var uniqueParents: [NavigationTreeNode<ViewController>?] = []
     for node in nodes {
       let containsParent = uniqueParents.contains {
         $0 == node.parentNode
@@ -141,7 +141,7 @@ class NavigationTreeDiff {
     return uniqueParents
   }
   
-  static func containsNode(_ node: NavigationTreeNode, in tree: NavigationTreeNode?) -> Bool {
+  static func containsNode(_ node: NavigationTreeNode<ViewController>, in tree: NavigationTreeNode<ViewController>?) -> Bool {
     return tree?.containsValue(value: node.value) ?? false
   }
 }

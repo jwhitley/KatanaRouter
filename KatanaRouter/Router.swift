@@ -14,11 +14,11 @@ public protocol RouterStore {
 
 /// Router reacts to the changes in the navigation tree and informs all the routables of the
 /// differences that they need to react to
-final public class Router {
+final public class Router<Store: RouterStore, ViewController: Routable> {
 
-  fileprivate let store: RouterStore
-  fileprivate var lastNavigationStateCopy: NavigationTreeNode?
-  var routables: [Destination : Routable]
+  fileprivate let store: Store
+  fileprivate var lastNavigationStateCopy: NavigationTreeNode<ViewController>?
+  var routables: [Destination<ViewController> : Routable]
   
   fileprivate lazy var routingQueue = DispatchQueue(label: "RoutingQueue", attributes: [])
 
@@ -26,16 +26,18 @@ final public class Router {
   ///   - store: The store, required to instantiate new Destinations
   ///   - rootRoutable: your root Routable instance. If your root node of your navigation tree is empty the Router will create it for you.
   ///   - rootIdentifier: your root Routable user identifier. Ignored if the navigation tree already has a root
-  public init(store: RouterStore, rootRoutable: Routable, rootIdentifier: String? = nil) {
+  public init(store:  Store, root: Destination<ViewController>) {
     self.store = store
     self.routables = [ : ]
 
-    store.dispatch(SetRootRoutable(router: self, routable: rootRoutable, identifier: rootIdentifier))
+    store.dispatch(SetRootRoutable(router: self, destination: root))
   }
 }
 
 extension Router {
-  func stateChanged(_ state: RoutableState) {
+  func stateChanged<State: RoutableState> (_ state: State)
+    where State.ViewController == ViewController {
+
     var currentState = state
     let currentRootNode = currentState.navigationState.mutateNavigationTreeRootNode()
     fireActionsForChanges(lastState: lastNavigationStateCopy, currentState: currentRootNode)
@@ -48,28 +50,25 @@ extension Router {
   ///
   /// - Parameter routable: root routable to be set
   /// - Parameter identifier: if new root is created, this identifier will used
-  func setupRootForRoutable(state: RoutableState, routable: Routable, identifier: String?) -> SetRootDestination? {
+  func setupRootForRoutable<State: RoutableState>(state: State, destination: Destination<ViewController>)
+    where State.ViewController == ViewController {
+
     var currentState = state
     // User has already set up a tree, we just have to add a routable for the root node
     if let rootNode = currentState.navigationState.mutateNavigationTreeRootNode() {
-      if identifier != nil {
+      if destination.userIdentifier != nil {
         print("[KatanaRouter] rootIdentifier has been passed in the Router `init`, but a navigation root already exists in the state. The rootIdentifier will not be used")
       }
-      assert(rootNode.value.routableType == type(of: routable), "rootRoutable is of different type than the current root node you've set")
-      routables[rootNode.value] = routable
+      routables[rootNode.value] = destination.create()
     } else {
       // User has not set up his tree, Router sets it up for him as a convenience
-      let rootDestination = Destination(routableType: type(of: routable), contextData: nil, userIdentifier: identifier)
-      routables[rootDestination] = routable
-      return SetRootDestination(rootDestination: rootDestination)
+      routables[destination] = destination.create()
     }
-
-    return nil
   }
 }
 
 private extension Router {
-  func fireActionsForChanges(lastState: NavigationTreeNode?, currentState: NavigationTreeNode?) {
+  func fireActionsForChanges(lastState: NavigationTreeNode<ViewController>?, currentState: NavigationTreeNode<ViewController>?) {
     let actions = NavigationTreeDiff.getNavigationDiffActions(lastState: lastState, currentState: currentState)
     
     for action in actions {
@@ -113,7 +112,7 @@ private extension Router {
     }
   }
   
-  func performPush(node: NavigationTreeNode, completion: @escaping RoutableCompletion) {
+  func performPush(node: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = node.parentNode {
       let routable = routables[parentNode.value]!.push(store: store, destination: node.value, completionHandler: completion)
       routables[node.value] = routable
@@ -123,7 +122,7 @@ private extension Router {
     }
   }
   
-  func performPop(node: NavigationTreeNode, completion: @escaping RoutableCompletion) {
+  func performPop(node: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = node.parentNode {
       routables[parentNode.value]!.pop(destination: node.value, completionHandler: completion)
     } else {
@@ -132,7 +131,7 @@ private extension Router {
     }
   }
   
-  func performChange(nodesToPop: [NavigationTreeNode], nodesToPush: [NavigationTreeNode], completion: @escaping RoutableCompletion) {
+  func performChange(nodesToPop: [NavigationTreeNode<ViewController>], nodesToPush: [NavigationTreeNode<ViewController>], completion: @escaping RoutableCompletion) {
     let node = nodesToPop.count > 0 ? nodesToPop[0] : nodesToPush[0]
     
     if let parentNode = node.parentNode {
@@ -155,7 +154,7 @@ private extension Router {
     }
   }
   
-  func performChangeActiveChild(activeChild: NavigationTreeNode, completion: @escaping RoutableCompletion) {
+  func performChangeActiveChild(activeChild: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = activeChild.parentNode {
       routables[parentNode.value]!.changeActiveDestination(store: store, currentActiveDestination: activeChild.value, completionHandler: completion)
     }

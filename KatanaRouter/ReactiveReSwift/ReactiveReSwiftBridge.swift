@@ -13,7 +13,6 @@ extension AddNewDestination: Action { }
 extension RemoveDestination: Action { }
 extension RemoveCurrentDestination: Action { }
 extension AddChildrenToDestination: Action { }
-extension SetRootDestination: Action { }
 extension SetRootRoutable: Action { }
 
 extension Variable: ObservablePropertyType {

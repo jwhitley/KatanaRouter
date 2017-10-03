@@ -8,14 +8,14 @@
 
 import Foundation
 
-public struct NavigationState {
-  private var navigationTreeRootNode: NavigationTreeNode?
+public struct NavigationState<ViewController: Routable> {
+  private var navigationTreeRootNode: NavigationTreeNode<ViewController>?
   
-  public init(navigationRootNode: NavigationTreeNode? = nil) {
+  public init(navigationRootNode: NavigationTreeNode<ViewController>? = nil) {
     self.navigationTreeRootNode = navigationRootNode
   }
   
-  mutating func setNavigationTreeRootNode(_ navigationTreeRootNode: NavigationTreeNode?) {
+  mutating func setNavigationTreeRootNode(_ navigationTreeRootNode: NavigationTreeNode<ViewController>?) {
     self.navigationTreeRootNode = navigationTreeRootNode
   }
   
@@ -23,7 +23,7 @@ public struct NavigationState {
   /// other `NavigationState` values
   ///
   /// - Returns: a copy of `navigationTreeRootNode`, which becomes the new `navigationTreeRootNode`
-  mutating func mutateNavigationTreeRootNode() -> NavigationTreeNode? {
+  mutating func mutateNavigationTreeRootNode() -> NavigationTreeNode<ViewController>? {
     navigationTreeRootNode = navigationTreeRootNode?.deepCopy()
     return navigationTreeRootNode
   }
@@ -32,7 +32,7 @@ public struct NavigationState {
 //MARK: NavigationState Mutation Helper Functions
 
 public extension NavigationState {
-  public mutating func addNewDestinationToActiveRoute(destination: Destination) {
+  public mutating func addNewDestinationToActiveRoute(destination: Destination<ViewController>) {
     let destinationNode = NavigationTreeNode(value: destination, isActiveRoute: true)
     
     guard let rootNode = mutateNavigationTreeRootNode() else {
