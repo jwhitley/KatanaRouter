@@ -8,7 +8,7 @@
 
 import ReactiveReSwift
 
-func navigationReducer<ViewController>(action: Action, state: NavigationState<ViewController>) -> NavigationState<ViewController> {
+public func navigationReducer<ViewController>(_ action: Action, _ state: NavigationState<ViewController>) -> NavigationState<ViewController> {
     // NOTE: This is uglier than it might be, primarily because the
     // protocol NavigationAction can't implement updatedState() without
     // associated types, which makes it useless in Swift.
@@ -19,9 +19,11 @@ func navigationReducer<ViewController>(action: Action, state: NavigationState<Vi
       return na.updatedState(currentState: state)
     case let na as RemoveCurrentDestination<ViewController>:
       return na.updatedState(currentState: state)
+    case let na as ReplaceChild<ViewController>:
+      return na.updatedState(currentState: state)
     case let na as AddChildrenToDestination<ViewController>:
       return na.updatedState(currentState: state)
-    case let na as SetRootRoutable<ViewController>:
+    case let na as SetRootDestination<ViewController>:
       return na.updatedState(currentState: state)
     default:
       return state

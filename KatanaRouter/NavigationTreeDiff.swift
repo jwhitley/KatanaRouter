@@ -8,14 +8,14 @@
 
 import Foundation
 
-enum NavigationTreeDiffAction<ViewController: Routable> {
+enum NavigationTreeDiffAction<ViewController: AnyObject> {
   case push(nodeToPush: NavigationTreeNode<ViewController>)
   case pop(nodeToPop: NavigationTreeNode<ViewController>)
   case changed(poppedNodes: [NavigationTreeNode<ViewController>], pushedNodes: [NavigationTreeNode<ViewController>])
   case changedActiveChild(currentActiveChild: NavigationTreeNode<ViewController>)
 }
 
-class NavigationTreeDiff<ViewController: Routable> {
+class NavigationTreeDiff<ViewController: AnyObject> {
   
   /// Returns an array of actions, which are the differences between lastState and currentState
   /// This method **does not change the state of the trees in any way**

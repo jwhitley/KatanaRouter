@@ -14,11 +14,11 @@ public protocol RouterStore {
 
 /// Router reacts to the changes in the navigation tree and informs all the routables of the
 /// differences that they need to react to
-final public class Router<Store: RouterStore, ViewController: Routable> {
+final public class Router<Store: RouterStore, ViewController: AnyObject> {
 
   fileprivate let store: Store
   fileprivate var lastNavigationStateCopy: NavigationTreeNode<ViewController>?
-  var routables: [Destination<ViewController> : Routable]
+  var routables: [Destination<ViewController> : Destination<ViewController>]
   
   fileprivate lazy var routingQueue = DispatchQueue(label: "RoutingQueue", attributes: [])
 
@@ -30,7 +30,7 @@ final public class Router<Store: RouterStore, ViewController: Routable> {
     self.store = store
     self.routables = [ : ]
 
-    store.dispatch(SetRootRoutable(router: self, destination: root))
+    store.dispatch(SetRootDestination(router: self, destination: root))
   }
 }
 
@@ -59,10 +59,10 @@ extension Router {
       if destination.userIdentifier != nil {
         print("[KatanaRouter] rootIdentifier has been passed in the Router `init`, but a navigation root already exists in the state. The rootIdentifier will not be used")
       }
-      routables[rootNode.value] = destination.create()
+      routables[rootNode.value] = destination
     } else {
       // User has not set up his tree, Router sets it up for him as a convenience
-      routables[destination] = destination.create()
+      routables[destination] = destination
     }
   }
 }
@@ -106,7 +106,7 @@ private extension Router {
         let result = completionSemaphore.wait(timeout: timeToWait)
         
         if case .timedOut = result {
-          fatalError("The Routable completion handler has not been called. Please make sure that you call the handler in each Routable method")
+          fatalError("The Destination completion handler has not been called. Please make sure that you call the handler in each Destination method")
         }
       }
     }
@@ -114,8 +114,7 @@ private extension Router {
   
   func performPush(node: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = node.parentNode {
-      let routable = routables[parentNode.value]!.push(store: store, destination: node.value, completionHandler: completion)
-      routables[node.value] = routable
+      parentNode.value.push(node.value, completion)
     } else {
       //This is root node, there is no parent to inform
       completion()
@@ -124,7 +123,7 @@ private extension Router {
   
   func performPop(node: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = node.parentNode {
-      routables[parentNode.value]!.pop(destination: node.value, completionHandler: completion)
+      parentNode.value.pop(node.value, completion)
     } else {
       //This is root node, there is no parent to inform
       completion()
@@ -137,17 +136,7 @@ private extension Router {
     if let parentNode = node.parentNode {
       let destinationsToPop = nodesToPop.map { $0.value }
       let destinationsToPush = nodesToPush.map { $0.value }
-      let routablesToAdd = routables[parentNode.value]!.change(store: store, destinationsToPop: destinationsToPop, destinationsToPush: destinationsToPush, completionHandler: completion)
-      
-      // Need to make sure that the user returned all the needed pushed Routables
-      for nodeToPush in nodesToPush {
-        let routable = routablesToAdd[nodeToPush.value]
-        if let routable = routable {
-          routables[nodeToPush.value] = routable
-        } else {
-          fatalError("Did not find a correct Routable for a pushed Destination. Please make sure you're returning a correct dictionary in change(destinationsToPop:destinationsToPush:completionHandler:)")
-        }
-      }
+      parentNode.value.change(destinationsToPop, destinationsToPush, completion)
     } else {
       //This is root node, there is no parent to inform
       completion()
@@ -156,7 +145,9 @@ private extension Router {
   
   func performChangeActiveChild(activeChild: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = activeChild.parentNode {
-      routables[parentNode.value]!.changeActiveDestination(store: store, currentActiveDestination: activeChild.value, completionHandler: completion)
+      parentNode.value.changeActiveDestination(activeChild.value, completion)
+    } else {
+      completion()
     }
   }
 }

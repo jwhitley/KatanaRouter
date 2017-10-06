@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct NavigationState<ViewController: Routable> {
+public struct NavigationState<ViewController: AnyObject> {
   private var navigationTreeRootNode: NavigationTreeNode<ViewController>?
   
   public init(navigationRootNode: NavigationTreeNode<ViewController>? = nil) {
@@ -58,6 +58,20 @@ public extension NavigationState {
     print(instanceIdentifier)
     
     nodeToRemove?.removeNode()        
+  }
+
+  /// Replace child at the specified destination
+  ///
+  /// This replaces the child at the destination matching `userIdentifier` with
+  /// the supplied `Destination`.
+  public mutating func replaceChild(parentIdentifier: String, with destination: Destination<ViewController>) {
+    guard let rootNode = mutateNavigationTreeRootNode(),
+          let parentNode = rootNode.find(userIdentifier: parentIdentifier),
+          let childNode  = parentNode.getActiveLeaf() else { return }
+
+    parentNode.removeChild(childNode)
+    let destinationNode = NavigationTreeNode(value: destination, isActiveRoute: true)
+    parentNode.addActiveLeaf(node: destinationNode)
   }
   
 }

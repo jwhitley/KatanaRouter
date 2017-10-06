@@ -12,8 +12,9 @@ import RxSwift
 extension AddNewDestination: Action { }
 extension RemoveDestination: Action { }
 extension RemoveCurrentDestination: Action { }
+extension ReplaceChild: Action { }
 extension AddChildrenToDestination: Action { }
-extension SetRootRoutable: Action { }
+extension SetRootDestination: Action { }
 
 extension Variable: ObservablePropertyType {
   public typealias ValueType = Element

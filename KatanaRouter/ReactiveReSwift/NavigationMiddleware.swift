@@ -9,12 +9,12 @@
 import ReactiveReSwift
 
 public protocol RoutableState {
-  associatedtype ViewController: Routable
+  associatedtype ViewController: AnyObject
 
   var navigationState: NavigationState<ViewController> { get set }
 }
 
-public class NavigationMiddleware<Store: RouterStore, ViewController, State: RoutableState>
+public class NavigationMiddleware<Store: RouterStore, ViewController: AnyObject, State: RoutableState>
   where State.ViewController == ViewController {
 
   var router: Router<Store, ViewController>!
@@ -27,8 +27,8 @@ public class NavigationMiddleware<Store: RouterStore, ViewController, State: Rou
 
   private var navMiddleware: Middleware<State> {
     return Middleware<State>().sideEffect { getState, dispatch, action in
-      /* >>>>> ACTION: SetRootRoutable <<<<< */
-      guard let setRootAction = action as? SetRootRoutable<ViewController> else {
+      /* >>>>> ACTION: SetRootDestination <<<<< */
+      guard let setRootAction = action as? SetRootDestination<ViewController> else {
         return
       }
 

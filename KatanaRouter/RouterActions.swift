@@ -9,7 +9,7 @@
 /// This action is a trigger for the NavigationMiddleware that updates the router's root routable,
 /// and emits SetRootDestination, above.
 ///
-public struct SetRootRoutable<ViewController: Routable>: NavigationAction {
+public struct SetRootDestination<ViewController: AnyObject>: NavigationAction {
   // The router to use in the state
   //
   // This must be of type Router<Store, ViewController>, but the type system fallout from

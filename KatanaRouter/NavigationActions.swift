@@ -22,7 +22,7 @@ public protocol NavigationAction {
 }
 
 /// Add a new destination on top of the current route
-public struct AddNewDestination<ViewController: Routable>: NavigationAction {
+public struct AddNewDestination<ViewController: AnyObject>: NavigationAction {
   
   private let destination: Destination<ViewController>
   
@@ -40,7 +40,7 @@ public struct AddNewDestination<ViewController: Routable>: NavigationAction {
 /// Removes the destination with given instance identifier from the navigation tree
 /// Doesn't do anything if the node is not in the tree
 /// Very useful for updating the tree with automatic navigation e.g. back button in UINavigationController
-public struct RemoveDestination<ViewController: Routable>: NavigationAction {
+public struct RemoveDestination<ViewController: AnyObject>: NavigationAction {
   
   private let instanceIdentifier: UUID
   
@@ -57,7 +57,7 @@ public struct RemoveDestination<ViewController: Routable>: NavigationAction {
 }
 
 /// Removes currently active destination
-public struct RemoveCurrentDestination<ViewController: Routable>: NavigationAction {
+public struct RemoveCurrentDestination<ViewController: AnyObject>: NavigationAction {
   public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
     state.removeDestinationAtActiveRoute()
@@ -69,8 +69,25 @@ public struct RemoveCurrentDestination<ViewController: Routable>: NavigationActi
   }
 }
 
+/// Replaces the specified node with the destination
+public struct ReplaceChild<ViewController: AnyObject>: NavigationAction {
+  private let parentIdentifier: String
+  private let destination: Destination<ViewController>
+
+  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+    var state = currentState
+    state.replaceChild(parentIdentifier: parentIdentifier, with: destination)
+    return state
+  }
+
+  public init(parentIdentifier: String, destination: Destination<ViewController>) {
+    self.parentIdentifier = parentIdentifier
+    self.destination = destination
+  }
+}
+
 // Add children to a node with given user identifier
-public struct AddChildrenToDestination<ViewController: Routable>: NavigationAction {
+public struct AddChildrenToDestination<ViewController: AnyObject>: NavigationAction {
   
   private let destinationIdentifier: String
   // All destinations to add

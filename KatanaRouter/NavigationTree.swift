@@ -10,7 +10,7 @@ import Foundation
 
 
 /// Navigation tree node, used to build a tree structure of the navigation state
-final public class NavigationTreeNode<ViewController: Routable>: Equatable {
+final public class NavigationTreeNode<ViewController: AnyObject>: Equatable {
   
   public let value: Destination<ViewController>
   /// Active route is the currently visible navigation path of nodes
