@@ -22,10 +22,10 @@ public class NavigationMiddleware<Store: RouterStore, ViewController: AnyObject,
   public init () { }
 
   public var middleware: Middleware<State> {
-    return Middleware(navMiddleware, routerMiddleware)
+    return routerMiddleware
   }
 
-  private var navMiddleware: Middleware<State> {
+  private var routerMiddleware: Middleware<State> {
     return Middleware<State>().sideEffect { getState, dispatch, action in
       /* >>>>> ACTION: SetRootDestination <<<<< */
       guard let setRootAction = action as? SetRootDestination<ViewController> else {
@@ -38,12 +38,6 @@ public class NavigationMiddleware<Store: RouterStore, ViewController: AnyObject,
 
       self.router.setupRootForRoutable(state: getState(),
                                        destination: setRootAction.destination)
-    }
-  }
-
-  private var routerMiddleware: Middleware<State> {
-    return Middleware<State>().sideEffect { getState, _, _ in
-      self.router.stateChanged(getState())
     }
   }
 }
