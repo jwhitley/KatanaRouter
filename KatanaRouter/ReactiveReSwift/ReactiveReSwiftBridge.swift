@@ -12,7 +12,7 @@ import RxSwift
 extension AddNewDestination: Action { }
 extension RemoveDestination: Action { }
 extension RemoveCurrentDestination: Action { }
-extension ReplaceChild: Action { }
+extension SelectChild: Action { }
 extension AddChildrenToDestination: Action { }
 extension SetRootDestination: Action { }
 
@@ -35,9 +35,15 @@ extension Observable: StreamType {
 }
 
 public struct DisposableWrapper: SubscriptionReferenceType {
-  let disposable: Disposable
+  public let disposable: Disposable
 
   public func dispose() {
     disposable.dispose()
+  }
+}
+
+extension Store: RouterStore {
+  public func dispatch<A: NavigationAction>(_ action: A) {
+    dispatch(action as! Action)
   }
 }

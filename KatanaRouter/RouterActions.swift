@@ -19,7 +19,7 @@ public struct SetRootDestination<ViewController: AnyObject>: NavigationAction {
   /// root destination to be set
   let destination: Destination<ViewController>
 
-  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+  public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
     let rootNode = NavigationTreeNode(value: destination, isActiveRoute: true)
     state.setNavigationTreeRootNode(rootNode)

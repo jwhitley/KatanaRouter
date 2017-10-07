@@ -14,17 +14,17 @@ public func navigationReducer<ViewController>(_ action: Action, _ state: Navigat
     // associated types, which makes it useless in Swift.
     switch action {
     case let na as AddNewDestination<ViewController>:
-      return na.updatedState(currentState: state)
+      return na.updatedState(state)
     case let na as RemoveDestination<ViewController>:
-      return na.updatedState(currentState: state)
+      return na.updatedState(state)
     case let na as RemoveCurrentDestination<ViewController>:
-      return na.updatedState(currentState: state)
-    case let na as ReplaceChild<ViewController>:
-      return na.updatedState(currentState: state)
+      return na.updatedState(state)
+    case let na as SelectChild<ViewController>:
+      return na.updatedState(state)
     case let na as AddChildrenToDestination<ViewController>:
-      return na.updatedState(currentState: state)
+      return na.updatedState(state)
     case let na as SetRootDestination<ViewController>:
-      return na.updatedState(currentState: state)
+      return na.updatedState(state)
     default:
       return state
     }

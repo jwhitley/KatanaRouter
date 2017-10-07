@@ -9,7 +9,7 @@
 import Foundation
 
 public protocol RouterStore {
-  func dispatch(_ action: NavigationAction)
+  func dispatch<A: NavigationAction>(_ action: A)
 }
 
 /// Router reacts to the changes in the navigation tree and informs all the routables of the
@@ -35,7 +35,7 @@ final public class Router<Store: RouterStore, ViewController: AnyObject> {
 }
 
 extension Router {
-  func stateChanged<State: RoutableState> (_ state: State)
+  public func stateChanged<State: RoutableState> (_ state: State)
     where State.ViewController == ViewController {
 
     var currentState = state
@@ -100,6 +100,10 @@ private extension Router {
           DispatchQueue.main.async {
             self.performChangeActiveChild(activeChild: activeChild, completion: completion)
           }
+        case .selectedActiveChild(let activeChild):
+          DispatchQueue.main.async {
+            self.performSelectActiveChild(activeChild: activeChild, completion: completion)
+          }
         }
         
         let timeToWait = DispatchTime.now() + .seconds(5)
@@ -146,6 +150,14 @@ private extension Router {
   func performChangeActiveChild(activeChild: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = activeChild.parentNode {
       parentNode.value.changeActiveDestination(activeChild.value, completion)
+    } else {
+      completion()
+    }
+  }
+
+  func performSelectActiveChild(activeChild: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
+    if let parentNode = activeChild.parentNode {
+      parentNode.value.selectActiveDestination(activeChild.value, completion)
     } else {
       completion()
     }

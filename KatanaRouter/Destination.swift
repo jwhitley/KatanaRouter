@@ -91,10 +91,23 @@ open class Destination<ViewController: AnyObject> {
 
   /// Called when there's a new destination set to active
   ///
+  /// It is optional for Destinations to override this method.
+  ///
   /// - Parameters:
   ///   - currentActiveDestination: destination that was set to active
   ///   - completionHandler: completion handler **needs to be called** after the transition
   open func changeActiveDestination(_ currentActiveDestination: Destination<ViewController>,
+                                    _ completionHandler: @escaping RoutableCompletion) {
+    completionHandler()
+  }
+
+  /// Called when the current active child is re-selected
+  ///
+  /// It is optional for Destinations to override this method.
+  ///
+  /// - parameter currentActiveDestination: destination that was set to active
+  /// - parameter completionHandler: completion handler **needs to be called** after the transition
+  open func selectActiveDestination(_ currentActiveDestination: Destination<ViewController>,
                                     _ completionHandler: @escaping RoutableCompletion) {
     completionHandler()
   }
@@ -111,6 +124,17 @@ extension Destination: Equatable, Hashable {
       return lhsUserIdentifier == rhsUserIdentifier
     } else {
       return lhs.instanceIdentifier == rhs.instanceIdentifier
+    }
+  }
+}
+
+extension Destination: CustomStringConvertible {
+  public var description: String {
+    let typeName = ("\(type(of: self))".split(separator: " ", maxSplits: 1).first!).dropFirst()
+    if let userId = self.userIdentifier {
+      return "\(typeName)(userId: \(userId), uuid: \(self.instanceIdentifier))"
+    } else {
+      return "\(typeName)(uuid: \(self.instanceIdentifier))"
     }
   }
 }

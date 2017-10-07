@@ -18,7 +18,9 @@ import Foundation
  separately in `navigationReducer`.
  */
 public protocol NavigationAction {
-//  func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController>
+//  associatedtype ViewController: AnyObject
+
+//  func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController>
 }
 
 /// Add a new destination on top of the current route
@@ -30,7 +32,7 @@ public struct AddNewDestination<ViewController: AnyObject>: NavigationAction {
     self.destination = destination
   }
   
-  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+  public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
     state.addNewDestinationToActiveRoute(destination: destination)
     return state
@@ -49,7 +51,7 @@ public struct RemoveDestination<ViewController: AnyObject>: NavigationAction {
     self.instanceIdentifier = instanceIdentifier
   }
   
-  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+  public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
     state.removeDestination(instanceIdentifier: instanceIdentifier)
     return state
@@ -58,7 +60,7 @@ public struct RemoveDestination<ViewController: AnyObject>: NavigationAction {
 
 /// Removes currently active destination
 public struct RemoveCurrentDestination<ViewController: AnyObject>: NavigationAction {
-  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+  public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
     state.removeDestinationAtActiveRoute()
     return state
@@ -69,20 +71,28 @@ public struct RemoveCurrentDestination<ViewController: AnyObject>: NavigationAct
   }
 }
 
-/// Replaces the specified node with the destination
-public struct ReplaceChild<ViewController: AnyObject>: NavigationAction {
+/// Selects the specified child with the destination
+public struct SelectChild<ViewController: AnyObject>: NavigationAction {
   private let parentIdentifier: String
-  private let destination: Destination<ViewController>
+  private let childIdentifier: String
 
-  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
-    var state = currentState
-    state.replaceChild(parentIdentifier: parentIdentifier, with: destination)
-    return state
+  public init(parentIdentifier: String, childIdentifier: String) {
+    self.parentIdentifier = parentIdentifier
+    self.childIdentifier = childIdentifier
   }
 
-  public init(parentIdentifier: String, destination: Destination<ViewController>) {
-    self.parentIdentifier = parentIdentifier
-    self.destination = destination
+  public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+    var state = currentState
+    guard let rootNode = state.mutateNavigationTreeRootNode(),
+          let parent = rootNode.find(userIdentifier: parentIdentifier),
+          let child  = parent.find(userIdentifier: childIdentifier) else {
+        print("Unable to find child '\(childIdentifier)' for parent '\(parentIdentifier)'")
+        return currentState
+    }
+
+    rootNode.selectActiveChild(parent: parent, child: child)
+    _ = rootNode.getActiveLeaf()
+    return state
   }
 }
 
@@ -115,7 +125,7 @@ public struct AddChildrenToDestination<ViewController: AnyObject>: NavigationAct
     self.activeDestination = child
   }
   
-  public func updatedState(currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
+  public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
     guard let node = state.mutateNavigationTreeRootNode()?.find(userIdentifier: destinationIdentifier) else {
       return currentState

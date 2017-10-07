@@ -57,6 +57,15 @@ final public class NavigationTreeNode<ViewController: AnyObject>: Equatable {
     
     return activeLeaf
   }
+
+  public func deactivate() {
+    guard isActiveRoute else { return }
+
+    isActiveRoute = false
+    if let activeChild = getActiveChild() {
+      activeChild.deactivate()
+    }
+  }
   
   public func addActiveLeaf(node: NavigationTreeNode) {
     let activeLeaf = self.getActiveLeaf() ?? self
@@ -64,6 +73,14 @@ final public class NavigationTreeNode<ViewController: AnyObject>: Equatable {
     node.isActiveRoute = true
     
     activeLeaf.addChild(node)
+  }
+
+  public func selectActiveChild(parent: NavigationTreeNode, child: NavigationTreeNode) {
+    let activeChild = parent.getActiveChild()
+    guard activeChild != child  else { return }
+
+    activeChild?.deactivate()
+    child.isActiveRoute = true
   }
   
   public func getActiveChild() -> NavigationTreeNode? {

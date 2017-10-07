@@ -12,7 +12,8 @@ enum NavigationTreeDiffAction<ViewController: AnyObject> {
   case push(nodeToPush: NavigationTreeNode<ViewController>)
   case pop(nodeToPop: NavigationTreeNode<ViewController>)
   case changed(poppedNodes: [NavigationTreeNode<ViewController>], pushedNodes: [NavigationTreeNode<ViewController>])
-  case changedActiveChild(currentActiveChild: NavigationTreeNode<ViewController>)
+  case changedActiveChild(child: NavigationTreeNode<ViewController>)
+  case selectedActiveChild(child: NavigationTreeNode<ViewController>)
 }
 
 class NavigationTreeDiff<ViewController: AnyObject> {
@@ -122,7 +123,9 @@ class NavigationTreeDiff<ViewController: AnyObject> {
       let lastActiveChild = lastStateNode?.getActiveChild()
       
       if lastActiveChild != currentActiveChild {
-        changedActiveChildActions.append(.changedActiveChild(currentActiveChild: currentActiveChild))
+        changedActiveChildActions.append(.changedActiveChild(child: currentActiveChild))
+      } else {
+        changedActiveChildActions.append(.selectedActiveChild(child: currentActiveChild))
       }
     }
     return changedActiveChildActions

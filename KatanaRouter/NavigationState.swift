@@ -67,9 +67,9 @@ public extension NavigationState {
   public mutating func replaceChild(parentIdentifier: String, with destination: Destination<ViewController>) {
     guard let rootNode = mutateNavigationTreeRootNode(),
           let parentNode = rootNode.find(userIdentifier: parentIdentifier),
-          let childNode  = parentNode.getActiveLeaf() else { return }
+          let currentChild  = parentNode.getActiveLeaf() else { return }
 
-    parentNode.removeChild(childNode)
+    parentNode.removeChild(currentChild)
     let destinationNode = NavigationTreeNode(value: destination, isActiveRoute: true)
     parentNode.addActiveLeaf(node: destinationNode)
   }
