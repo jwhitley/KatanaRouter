@@ -17,11 +17,20 @@ public struct SetRootDestination<ViewController: AnyObject>: NavigationAction {
   let router: Any
 
   /// root destination to be set
-  let destination: Destination<ViewController>
+  let root: Destination<ViewController>
+
+  let children: [Destination<ViewController>]
+
+  let activeDestination: Destination<ViewController>
 
   public func updatedState(_ currentState: NavigationState<ViewController>) -> NavigationState<ViewController> {
     var state = currentState
-    let rootNode = NavigationTreeNode(value: destination, isActiveRoute: true)
+    let rootNode = NavigationTreeNode(value: root, isActiveRoute: true)
+    let childNodes = children.map { addDestination -> NavigationTreeNode<ViewController> in
+      return NavigationTreeNode(value: addDestination, isActiveRoute: addDestination == activeDestination)
+    }
+    rootNode.addChildren(childNodes)
+
     state.setNavigationTreeRootNode(rootNode)
     return state
   }

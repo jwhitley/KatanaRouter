@@ -37,7 +37,7 @@ public class NavigationMiddleware<Store: RouterStore, ViewController: AnyObject,
       }
 
       self.router.setupRootForRoutable(state: getState(),
-                                       destination: setRootAction.destination)
+                                       destination: setRootAction.root)
     }
   }
 }

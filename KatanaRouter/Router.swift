@@ -24,13 +24,17 @@ final public class Router<Store: RouterStore, ViewController: AnyObject> {
 
   /// - Parameters:
   ///   - store: The store, required to instantiate new Destinations
-  ///   - rootRoutable: your root Routable instance. If your root node of your navigation tree is empty the Router will create it for you.
-  ///   - rootIdentifier: your root Routable user identifier. Ignored if the navigation tree already has a root
-  public init(store:  Store, root: Destination<ViewController>) {
+  ///   - root: your root Destination instance. If your root node of your navigation tree is empty the Router will create it for you.
+  ///   - children: optional child Destination nodes required for setup of your root node
+  ///   - activeDestination: the child to be marked as the active route
+  public init(store:  Store,
+              root: Destination<ViewController>,
+              children: [Destination<ViewController>] = [],
+              activeDestination: Destination<ViewController>) {
     self.store = store
     self.routables = [ : ]
 
-    store.dispatch(SetRootDestination(router: self, destination: root))
+    store.dispatch(SetRootDestination(router: self, root: root, children: children, activeDestination: activeDestination))
   }
 }
 
