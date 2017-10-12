@@ -91,7 +91,6 @@ public struct SelectChild<ViewController: AnyObject>: NavigationAction {
     }
 
     rootNode.selectActiveChild(parent: parent, child: child)
-    _ = rootNode.getActiveLeaf()
     return state
   }
 }
