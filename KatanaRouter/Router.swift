@@ -104,10 +104,6 @@ private extension Router {
           DispatchQueue.main.async {
             self.performChangeActiveChild(activeChild: activeChild, completion: completion)
           }
-        case .selectedActiveChild(let activeChild):
-          DispatchQueue.main.async {
-            self.performSelectActiveChild(activeChild: activeChild, completion: completion)
-          }
         }
         
         let timeToWait = DispatchTime.now() + .seconds(5)
@@ -154,14 +150,6 @@ private extension Router {
   func performChangeActiveChild(activeChild: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
     if let parentNode = activeChild.parentNode {
       parentNode.value.changeActiveDestination(activeChild.value, completion)
-    } else {
-      completion()
-    }
-  }
-
-  func performSelectActiveChild(activeChild: NavigationTreeNode<ViewController>, completion: @escaping RoutableCompletion) {
-    if let parentNode = activeChild.parentNode {
-      parentNode.value.selectActiveDestination(activeChild.value, completion)
     } else {
       completion()
     }

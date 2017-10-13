@@ -100,17 +100,6 @@ open class Destination<ViewController: AnyObject> {
                                     _ completionHandler: @escaping RoutableCompletion) {
     completionHandler()
   }
-
-  /// Called when the current active child is re-selected
-  ///
-  /// It is optional for Destinations to override this method.
-  ///
-  /// - parameter currentActiveDestination: destination that was set to active
-  /// - parameter completionHandler: completion handler **needs to be called** after the transition
-  open func selectActiveDestination(_ currentActiveDestination: Destination<ViewController>,
-                                    _ completionHandler: @escaping RoutableCompletion) {
-    completionHandler()
-  }
 }
 
 extension Destination: Equatable, Hashable {
