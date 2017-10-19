@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "KatanaRouter"
-  s.version          = "0.5"
+  s.version          = "0.6"
   s.summary          = "App Routing for Katana"
   s.description      = <<-DESC
 						  Declarative and type-safe routing for Katana.
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
     rere.frameworks = "Foundation"
     rere.dependency 'KatanaRouter/Core'
     rere.dependency 'ReactiveReSwift', '~> 3.0.6'
-    rere.dependency 'RxSwift',         '~> 3.6.1'
+    rere.dependency 'RxSwift',         '~> 4.0'
   end
 
   s.default_subspec = "Core"

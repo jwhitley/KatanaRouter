@@ -3,7 +3,7 @@ target 'KatanaRouter' do
   use_frameworks!
 
   pod 'ReactiveReSwift'
-  pod 'RxSwift', '~> 3.6.1'
+  pod 'RxSwift', '~> 4.0'
 
   target 'KatanaRouterTests' do
     inherit! :search_paths
