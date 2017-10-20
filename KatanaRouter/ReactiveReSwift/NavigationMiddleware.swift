@@ -27,17 +27,20 @@ public class NavigationMiddleware<Store: RouterStore, ViewController: AnyObject,
 
   private var routerMiddleware: Middleware<State> {
     return Middleware<State>().sideEffect { getState, dispatch, action in
-      /* >>>>> ACTION: SetRootDestination <<<<< */
-      guard let setRootAction = action as? SetRootDestination<ViewController> else {
+      switch action {
+      case let setRootAction as SetRootDestination<ViewController>:
+        if self.router == nil, let router = setRootAction.router as? Router<Store, ViewController> {
+          self.router = router
+        }
+
+        self.router.setupRootForRoutable(state: getState(),  destination: setRootAction.root)
+
+      case let addNewAction as AddNewDestinationCreator<ViewController, Store>:
+        dispatch(AddNewDestination(destination: addNewAction.creator(self.router.store)))
+
+      default:
         return
       }
-
-      if self.router == nil, let router = setRootAction.router as? Router<Store, ViewController> {
-        self.router = router
-      }
-
-      self.router.setupRootForRoutable(state: getState(),
-                                       destination: setRootAction.root)
     }
   }
 }

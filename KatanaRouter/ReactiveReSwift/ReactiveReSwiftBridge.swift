@@ -16,6 +16,17 @@ extension SelectChild: Action { }
 extension AddChildrenToDestination: Action { }
 extension SetRootDestination: Action { }
 
+public typealias DestinationCreator<ViewController, Store> = (Store) -> Destination<ViewController>
+
+/// Add a new destination on top of the current route
+public struct AddNewDestinationCreator<ViewController: AnyObject, Store>: Action {
+  public let creator: DestinationCreator<ViewController, Store>
+
+  public init(creator: @escaping DestinationCreator<ViewController, Store>) {
+    self.creator = creator
+  }
+}
+
 extension Variable: ObservablePropertyType {
   public typealias ValueType = Element
   public typealias DisposeType = DisposableWrapper

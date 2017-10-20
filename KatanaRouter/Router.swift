@@ -16,7 +16,7 @@ public protocol RouterStore {
 /// differences that they need to react to
 final public class Router<Store: RouterStore, ViewController: AnyObject> {
 
-  fileprivate let store: Store
+  public let store: Store
   fileprivate var lastNavigationStateCopy: NavigationTreeNode<ViewController>?
   var routables: [Destination<ViewController> : Destination<ViewController>]
   
