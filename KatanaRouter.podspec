@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
     rere.source_files = 'KatanaRouter/ReactiveReSwift'
     rere.frameworks = "Foundation"
     rere.dependency 'KatanaRouter/Core'
-    rere.dependency 'ReactiveReSwift', '~> 3.0.6'
+    rere.dependency 'ReactiveReSwift', '~> 4.0'
     rere.dependency 'RxSwift',         '~> 4.0'
   end
 
