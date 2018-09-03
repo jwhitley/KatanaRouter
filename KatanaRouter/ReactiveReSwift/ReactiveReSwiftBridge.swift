@@ -16,13 +16,11 @@ extension SelectChild: Action { }
 extension AddChildrenToDestination: Action { }
 extension SetRootDestination: Action { }
 
-public typealias DestinationCreator<ViewController, Store> = (Store) -> Destination<ViewController>
-
 /// Add a new destination on top of the current route
 public struct AddNewDestinationCreator<ViewController: AnyObject, Store>: Action {
-  public let creator: DestinationCreator<ViewController, Store>
+  public let creator: (Store) -> Destination<ViewController>
 
-  public init(creator: @escaping DestinationCreator<ViewController, Store>) {
+  public init(creator: @escaping (Store) -> Destination<ViewController>) {
     self.creator = creator
   }
 }
@@ -31,7 +29,7 @@ extension Variable: ObservablePropertyType {
   public typealias ValueType = Element
   public typealias DisposeType = DisposableWrapper
 
-  public func subscribe(_ function: @escaping (Element) -> Void) -> DisposableWrapper? {
+  public func subscribe(_ function: @escaping (Element) -> Void) -> DisposableWrapper {
     return DisposableWrapper(disposable: asObservable().subscribe(onNext: function))
   }
 }
@@ -40,7 +38,7 @@ extension Observable: StreamType {
   public typealias ValueType = Element
   public typealias DisposeType = DisposableWrapper
 
-  public func subscribe(_ function: @escaping (Element) -> Void) -> DisposableWrapper? {
+  public func subscribe(_ function: @escaping (Element) -> Void) -> DisposableWrapper {
     return DisposableWrapper(disposable: subscribe(onNext: function))
   }
 }
