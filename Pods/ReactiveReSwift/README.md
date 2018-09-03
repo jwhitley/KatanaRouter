@@ -40,7 +40,7 @@ For a very simple app, one that maintains a counter that can be increased and de
 
 ```swift
 struct AppState {
-  var counter: Int
+  let counter: Int
 }
 ```
 
@@ -48,8 +48,8 @@ You would also define two actions, one for increasing and one for decreasing the
 
 ```swift
 enum AppAction: Action {
-	case Increase
-    case Decrease
+    case increase
+    case decrease
 }
 ```
 
@@ -58,14 +58,13 @@ Your reducer needs to respond to these different actions, that can be done by sw
 ```swift
 let appReducer: Reducer<AppState> = { action, state in
     switch action as? AppAction {
-	case .Increase?:
-        state.counter += 1
-	case .Decrease?:
-        state.counter -= 1
-	default:
-        break
-	}
-    return state
+    case .increase?:
+        return AppState(counter: state.counter + 1)
+    case .decrease?:
+        return AppState(counter: state.counter - 1)
+    default:
+        return state
+    }
 }
 ```
 
@@ -76,7 +75,7 @@ In order to have a predictable app state, it is important that the reducer is al
 To maintain our state and delegate the actions to the reducers, we need a store. Let's call it `mainStore` and define it as a global constant, for example in the app delegate file:
 
 ```swift
-fileprivate let initialState = AppState(counter: 0)
+let initialState = AppState(counter: 0)
 
 let mainStore = Store(
   reducer: appReducer,
@@ -106,13 +105,13 @@ class CounterViewController: UIViewController {
 
   @IBAction func increaseButtonTapped(sender: UIButton) {
     mainStore.dispatch(
-      AppState.CounterActionIncrease
+      AppAction.increase
     )
   }
 
   @IBAction func decreaseButtonTapped(sender: UIButton) {
     mainStore.dispatch(
-      AppState.CounterActionDecrease
+      AppAction.decrease
     )
   }
 
@@ -155,13 +154,27 @@ A common design pattern with Redux and its derivates is to observe your store us
 
 Instead of pushing that onto the user, and to encourage people to use FRP, ReactiveReSwift provides protocols to conform to so that the underlying `Store` can directly use the observables from your preferred library without subclassing.
 
-ReactiveReSwift also comes with an extremely simple implementation of a functional reactive observable. This `ObservableProperty` type allows you to use ReactiveReSwift without any other FRP libraries and not lose any of the functionality provided by ReSwift. We do still highly encourage you to use a functional reactive library with ReactiveReSwift, though.
+ReactiveReSwift also comes with an extremely simple implementation of a functional reactive observable. This `ObservableProperty` type allows you to use ReactiveReSwift without any other FRP libraries and not lose any of the functionality provided by ReSwift. That said, we do still highly encourage you to use a functional reactive library with ReactiveReSwift.
 
 # Getting Started Guide
 
 [The documentation for ReactiveReSwift can be found here](http://reswift.github.io/ReactiveReSwift/master/getting-started-guide.html). To get an understanding of the core principles we recommend reading the brilliant [redux documentation](http://redux.js.org/).
 
 # Installation
+
+## CocoaPods
+
+You can install ReactiveReSwift via CocoaPods by adding it to your `Podfile`:
+```
+use_frameworks!
+
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.0'
+
+pod 'ReactiveReSwift'
+```
+
+And run `pod install`.
 
 ## Carthage
 
@@ -185,6 +198,12 @@ let package = Package(
     ]
 )
 ```
+
+# Roadmap
+
+## Swift 4
+
+- Change serialisation to use `Codable` and `Decodable` protocols provided by Swift 4.
 
 # Example Projects
 
@@ -210,6 +229,5 @@ There's still a lot of work to do here! We would love to see you involved! You c
 If you have any questions, you can find the core team on twitter:
 
 - [@chartortorella](https://twitter.com/chartortorella)
-- [@karlbowden](https://twitter.com/karlbowden)
 
 We also have a [public gitter chat!](https://gitter.im/ReactiveReSwift/Lobby)

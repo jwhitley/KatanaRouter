@@ -10,8 +10,9 @@ import Foundation
 
 open class Store<ObservableProperty: ObservablePropertyType> {
 
-    public typealias StoreMiddleware = Middleware<ObservableProperty.ValueType>
-    public typealias StoreReducer = Reducer<ObservableProperty.ValueType>
+    public typealias State = ObservableProperty.ValueType
+    public typealias StoreMiddleware = Middleware<State>
+    public typealias StoreReducer = Reducer<State>
 
     open private(set) var observable: ObservableProperty
     private let middleware: StoreMiddleware
@@ -24,7 +25,7 @@ open class Store<ObservableProperty: ObservablePropertyType> {
         self.middleware = middleware
     }
 
-    public func dispatch(_ actions: Action...) {
+    open func dispatch(_ actions: Action...) {
         actions.forEach { action in
             let dispatchFunction: (Action...) -> Void = { [weak self] (actions: Action...) in
                 actions.forEach { self?.dispatch($0) }
@@ -35,9 +36,12 @@ open class Store<ObservableProperty: ObservablePropertyType> {
         }
     }
 
-    public func dispatch<S: StreamType>(_ stream: S) where S.ValueType: Action {
-        disposeBag += stream.subscribe { [unowned self] action in
+    @discardableResult
+    open func dispatch<S: StreamType>(_ stream: S) -> SubscriptionReferenceType where S.ValueType: Action {
+        let disposable = stream.subscribe { [unowned self] action in
             self.dispatch(action)
         }
+        disposeBag += disposable
+        return disposable
     }
 }
